@@ -105,7 +105,8 @@ public class RestaurantResource {
             throw new MissingParameterException("Missing 'Owner' header");
         }
     }
-    private void verifyValidReservationEndTime(ReservationRequest reservationRequest, String restaurantId) throws InvalidParameterException {
+    private void verifyValidReservationEndTime(ReservationRequest reservationRequest, String restaurantId)
+            throws InvalidParameterException {
         Restaurant restaurant = resourcesHandler.getRestaurant(restaurantId);
         ReservationConfiguration reservationConfiguration = restaurant.getRestaurantConfiguration();
 
@@ -114,7 +115,8 @@ public class RestaurantResource {
         LocalTime closingTime = LocalTime.parse(restaurant.getHours().getClose());
 
         if (reservationStartTime.plus(reservationDuration).isAfter(closingTime)){
-            throw new InvalidParameterException("Invalid reservation start Time, the reservation exceeds the restaurant's closing time");
+            throw new InvalidParameterException(
+                    "Invalid reservation start Time, the reservation exceeds the restaurant's closing time");
         }
     };
 }
