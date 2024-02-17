@@ -121,5 +121,4 @@ public class RestaurantResource {
                     "Invalid reservation start time, the reservation exceeds the restaurant's closing time");
         }
     }
-
 }
