@@ -2,6 +2,7 @@ package ca.ulaval.glo2003.controllers;
 
 import ca.ulaval.glo2003.Main;
 import ca.ulaval.glo2003.domain.reservation.Reservation;
+import ca.ulaval.glo2003.domain.restaurant.ReservationConfiguration;
 import ca.ulaval.glo2003.domain.restaurant.Restaurant;
 import ca.ulaval.glo2003.domain.exceptions.InvalidParameterException;
 import ca.ulaval.glo2003.domain.exceptions.MissingParameterException;
@@ -23,6 +24,8 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 
 import java.net.URI;
+import java.time.LocalTime;
+import java.time.Duration;
 import java.util.List;
 
 import static ca.ulaval.glo2003.models.RestaurantRequest.verifyRestaurantOwnership;
@@ -76,6 +79,7 @@ public class RestaurantResource {
         throws NotFoundException, InvalidParameterException, MissingParameterException {
         verifyValidRestaurantIdPath(restaurantId);
         reservationRequest.verifyParameters();
+        verifyValidReservationEndTime(reservationRequest, restaurantId);
         Reservation reservation = new Reservation(
             restaurantId,
             reservationRequest.getDate(),
@@ -101,4 +105,16 @@ public class RestaurantResource {
             throw new MissingParameterException("Missing 'Owner' header");
         }
     }
+    private void verifyValidReservationEndTime(ReservationRequest reservationRequest, String restaurantId) throws InvalidParameterException {
+        Restaurant restaurant = resourcesHandler.getRestaurant(restaurantId);
+        ReservationConfiguration reservationConfiguration = restaurant.getRestaurantConfiguration();
+
+        LocalTime reservationStartTime = LocalTime.parse(reservationRequest.getStartTime());
+        Duration reservationDuration = Duration.ofMinutes(reservationConfiguration.getDuration());
+        LocalTime closingTime = LocalTime.parse(restaurant.getHours().getClose());
+
+        if (reservationStartTime.plus(reservationDuration).isAfter(closingTime)){
+            throw new InvalidParameterException("Invalid reservation start Time, the reservation exceeds the restaurant's closing time");
+        }
+    };
 }
