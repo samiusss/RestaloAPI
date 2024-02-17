@@ -113,10 +113,13 @@ public class RestaurantResource {
         LocalTime reservationStartTime = LocalTime.parse(reservationRequest.getStartTime());
         Duration reservationDuration = Duration.ofMinutes(reservationConfiguration.getDuration());
         LocalTime closingTime = LocalTime.parse(restaurant.getHours().getClose());
+        LocalTime openingTime = LocalTime.parse(restaurant.getHours().getOpen());
+        LocalTime reservationEndTime = reservationStartTime.plus(reservationDuration);
 
-        if (reservationStartTime.plus(reservationDuration).isAfter(closingTime)){
+        if (reservationEndTime.isAfter(closingTime) || reservationEndTime.isBefore(openingTime)) {
             throw new InvalidParameterException(
-                    "Invalid reservation start Time, the reservation exceeds the restaurant's closing time");
+                    "Invalid reservation start time, the reservation exceeds the restaurant's closing time");
         }
-    };
+    }
+
 }
