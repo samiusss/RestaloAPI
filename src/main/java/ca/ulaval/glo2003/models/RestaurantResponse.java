@@ -13,7 +13,6 @@ public class RestaurantResponse {
     public Integer capacity;
     public Hours hours;
     public ReservationConfiguration reservations;
-    public Map<String, Reservation> reservationsById;
 
     public RestaurantResponse(Restaurant restaurant) {
         this.id = restaurant.getId();
@@ -21,6 +20,5 @@ public class RestaurantResponse {
         this.capacity = restaurant.getCapacity();
         this.hours = restaurant.getHours();
         this.reservations = restaurant.getRestaurantConfiguration();
-        this.reservationsById = restaurant.getReservationsById();
     }
 }
