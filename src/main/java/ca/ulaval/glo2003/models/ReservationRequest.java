@@ -5,6 +5,8 @@ import ca.ulaval.glo2003.domain.exceptions.MissingParameterException;
 import ca.ulaval.glo2003.domain.exceptions.InvalidParameterException;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,6 +77,18 @@ public class ReservationRequest {
         verifyMissingCustomer();
     }
 
+    public void adjustReservationStartTime() {
+        LocalTime startTime = LocalTime.parse(this.startTime);
+        int minutes = startTime.getMinute();
+
+        if (minutes % 15 != 0) {
+            int adjustmentMinutes = calculateAdjustment(minutes);
+            LocalTime adjustedStartTime = startTime.plusMinutes(adjustmentMinutes).withSecond(0);
+            String formattedAdjustedStartTime = formatAdjustedStartTime(adjustedStartTime);
+            setStartTime(formattedAdjustedStartTime);
+        }
+    }
+
     private void verifyMissing(String parameterName, Object parameterValue) throws MissingParameterException {
         if (parameterValue == null) {
             throw new MissingParameterException("Missing parameter '" + parameterName + "'");
@@ -127,5 +141,17 @@ public class ReservationRequest {
     private boolean isValidEmail(String email) {
         Matcher matcher = EMAIL_PATTERN.matcher(email);
         return matcher.matches();
+    }
+
+
+
+    private int calculateAdjustment(int minutes) {
+        int remainder = minutes % 15;
+        return 15 - remainder;
+    }
+
+    private String formatAdjustedStartTime(LocalTime adjustedStartTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        return adjustedStartTime.format(formatter);
     }
 }

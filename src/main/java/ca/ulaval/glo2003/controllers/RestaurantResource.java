@@ -78,7 +78,7 @@ public class RestaurantResource {
         throws NotFoundException, InvalidParameterException, MissingParameterException {
         verifyValidRestaurantIdPath(restaurantId);
         reservationRequest.verifyParameters();
-        adjustReservationStartTime(reservationRequest);
+        reservationRequest.adjustReservationStartTime();
         Reservation reservation = new Reservation(
             restaurantId,
             reservationRequest.getDate(),
@@ -105,26 +105,6 @@ public class RestaurantResource {
         }
     }
 
-    private void adjustReservationStartTime(ReservationRequest reservationRequest) {
-        LocalTime startTime = LocalTime.parse(reservationRequest.getStartTime());
-        int minutes = startTime.getMinute();
 
-        if (minutes % 15 != 0) {
-            int adjustmentMinutes = calculateAdjustment(minutes);
-            LocalTime adjustedStartTime = startTime.plusMinutes(adjustmentMinutes).withSecond(0);
-            String formattedAdjustedStartTime = formatAdjustedStartTime(adjustedStartTime);
-            reservationRequest.setStartTime(formattedAdjustedStartTime);
-        }
-    }
-
-    private int calculateAdjustment(int minutes) {
-        int remainder = minutes % 15;
-        return 15 - remainder;
-    }
-
-    private String formatAdjustedStartTime(LocalTime adjustedStartTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        return adjustedStartTime.format(formatter);
-    }
 
 }
