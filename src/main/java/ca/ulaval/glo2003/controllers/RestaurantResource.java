@@ -100,22 +100,32 @@ public class RestaurantResource {
             throw new NotFoundException("Restaurant not found with ID: " + restaurantId);
         }
     }
+
     private void verifyMissingHeader(String ownerId) throws MissingParameterException {
         if (ownerId == null) {
             throw new MissingParameterException("Missing 'Owner' header");
         }
     }
+
     private void verifyValidReservationEndTime(ReservationRequest reservationRequest, String restaurantId)
             throws InvalidParameterException {
         Restaurant restaurant = resourcesHandler.getRestaurant(restaurantId);
         ReservationConfiguration reservationConfiguration = restaurant.getRestaurantConfiguration();
-
-        LocalTime reservationStartTime = LocalTime.parse(reservationRequest.getStartTime());
-        Duration reservationDuration = Duration.ofMinutes(reservationConfiguration.getDuration());
+        LocalTime reservationEndTime = calculateReservationEndTime(reservationRequest, reservationConfiguration);
         LocalTime closingTime = LocalTime.parse(restaurant.getHours().getClose());
         LocalTime openingTime = LocalTime.parse(restaurant.getHours().getOpen());
-        LocalTime reservationEndTime = reservationStartTime.plus(reservationDuration);
+        verifyReservationWithinOperatingHours(reservationEndTime, closingTime, openingTime);
+    }
 
+    private LocalTime calculateReservationEndTime(
+            ReservationRequest reservationRequest, ReservationConfiguration reservationConfiguration) {
+        LocalTime reservationStartTime = LocalTime.parse(reservationRequest.getStartTime());
+        Duration reservationDuration = Duration.ofMinutes(reservationConfiguration.getDuration());
+        return reservationStartTime.plus(reservationDuration);
+    }
+
+    private void verifyReservationWithinOperatingHours(
+            LocalTime reservationEndTime, LocalTime closingTime, LocalTime openingTime) throws InvalidParameterException {
         if (reservationEndTime.isAfter(closingTime) || reservationEndTime.isBefore(openingTime)) {
             throw new InvalidParameterException(
                     "Invalid reservation start time, the reservation exceeds the restaurant's closing time");
