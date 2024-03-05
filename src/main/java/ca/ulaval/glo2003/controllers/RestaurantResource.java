@@ -1,13 +1,9 @@
 package ca.ulaval.glo2003.controllers;
 
 import ca.ulaval.glo2003.Main;
-import ca.ulaval.glo2003.domain.reservation.Reservation;
-import ca.ulaval.glo2003.domain.restaurant.ReservationConfiguration;
-import ca.ulaval.glo2003.domain.restaurant.Restaurant;
 import ca.ulaval.glo2003.domain.exceptions.InvalidParameterException;
 import ca.ulaval.glo2003.domain.exceptions.MissingParameterException;
 import ca.ulaval.glo2003.domain.utils.ResourcesHandler;
-import ca.ulaval.glo2003.domain.factories.RestaurantFactory;
 import ca.ulaval.glo2003.models.ReservationRequest;
 import ca.ulaval.glo2003.models.ReservationResponse;
 import ca.ulaval.glo2003.models.RestaurantRequest;
@@ -25,20 +21,14 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 
 import java.net.URI;
-import java.time.LocalTime;
-import java.time.Duration;
 import java.util.List;
 
-import static ca.ulaval.glo2003.models.RestaurantRequest.verifyRestaurantOwnership;
 
 @Path("/")
 public class RestaurantResource {
     public ResourcesHandler resourcesHandler;
-    private RestaurantFactory restaurantFactory;
-
     public RestaurantResource(ResourcesHandler resourcesHandler) {
         this.resourcesHandler = resourcesHandler;
-        this.restaurantFactory = new RestaurantFactory();
     }
 
     @GET
@@ -57,10 +47,14 @@ public class RestaurantResource {
         verifyMissingHeader(ownerId);
         restaurantRequest.verifyParameters();
 
-        Restaurant restaurant = restaurantFactory.buildRestaurant(ownerId, restaurantRequest);
-        resourcesHandler.addRestaurant(restaurant);
+        String createdRestaurantId = resourcesHandler.addRestaurant(
+                ownerId,
+                restaurantRequest.getName(),
+                restaurantRequest.getCapacity(),
+                restaurantRequest.getHours(),
+                restaurantRequest.getRestaurantConfiguration());
 
-        URI newProductURI = UriBuilder.fromResource(RestaurantResource.class).path("restaurants").path(restaurant.getId()).build();
+        URI newProductURI = UriBuilder.fromResource(RestaurantResource.class).path("restaurants").path(createdRestaurantId).build();
         return Response.created(newProductURI).build();
     }
 
@@ -70,9 +64,8 @@ public class RestaurantResource {
     public Response getRestaurant(@HeaderParam("Owner") String ownerID, @PathParam("id") String restaurantId)
         throws MissingParameterException, NotFoundException {
         verifyMissingHeader(ownerID);
-        Restaurant restaurant = resourcesHandler.getRestaurant(restaurantId);
-        verifyRestaurantOwnership(restaurant.getOwnerId(), ownerID);
-        return Response.ok(new RestaurantResponse(restaurant)).build();
+        RestaurantResponse response = resourcesHandler.getRestaurant(restaurantId, ownerID);
+        return Response.ok(response).build();
     }
 
     @POST
@@ -80,10 +73,12 @@ public class RestaurantResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createReservation(@PathParam("id") String restaurantId, ReservationRequest reservationRequest)
         throws NotFoundException, InvalidParameterException, MissingParameterException {
-        verifyValidRestaurantIdPath(restaurantId);
+        resourcesHandler.verifyValidRestaurantIdPath(restaurantId);
         reservationRequest.verifyParameters();
         reservationRequest.adjustReservationStartTime();
-        verifyValidReservationEndTime(reservationRequest, restaurantId);
+        resourcesHandler.verifyValidReservationEndTime(
+                restaurantId,
+                reservationRequest.getStartTime());
 
         String createdReservationId = resourcesHandler.addReservation(
                 restaurantId,
@@ -103,44 +98,13 @@ public class RestaurantResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getReservation(@PathParam("number") String reservationId)
         throws NotFoundException {
-        Reservation reservation = resourcesHandler.getReservation(reservationId);
-        return Response.ok(new ReservationResponse(reservation, resourcesHandler)).build();
-    }
-
-    private void verifyValidRestaurantIdPath(String restaurantId) {
-        if (resourcesHandler.getRestaurant(restaurantId) == null) {
-            throw new NotFoundException("Restaurant not found with ID: " + restaurantId);
-        }
+        ReservationResponse foundReservationResponse = resourcesHandler.getReservation(reservationId);
+        return Response.ok(foundReservationResponse).build();
     }
 
     private void verifyMissingHeader(String ownerId) throws MissingParameterException {
         if (ownerId == null) {
             throw new MissingParameterException("Missing 'Owner' header");
-        }
-    }
-
-    private void verifyValidReservationEndTime(ReservationRequest reservationRequest, String restaurantId)
-        throws InvalidParameterException {
-        Restaurant restaurant = resourcesHandler.getRestaurant(restaurantId);
-        ReservationConfiguration reservationConfiguration = restaurant.getRestaurantConfiguration();
-        LocalTime reservationEndTime = calculateReservationEndTime(reservationRequest, reservationConfiguration);
-        LocalTime closingTime = LocalTime.parse(restaurant.getHours().getClose());
-        LocalTime openingTime = LocalTime.parse(restaurant.getHours().getOpen());
-        verifyReservationWithinOperatingHours(reservationEndTime, closingTime, openingTime);
-    }
-
-    private LocalTime calculateReservationEndTime(
-        ReservationRequest reservationRequest, ReservationConfiguration reservationConfiguration) {
-        LocalTime reservationStartTime = LocalTime.parse(reservationRequest.getStartTime());
-        Duration reservationDuration = Duration.ofMinutes(reservationConfiguration.getDuration());
-        return reservationStartTime.plus(reservationDuration);
-    }
-
-    private void verifyReservationWithinOperatingHours(
-        LocalTime reservationEndTime, LocalTime closingTime, LocalTime openingTime) throws InvalidParameterException {
-        if (reservationEndTime.isAfter(closingTime) || reservationEndTime.isBefore(openingTime)) {
-            throw new InvalidParameterException(
-                "Invalid reservation start time, the reservation exceeds the restaurant's closing time");
         }
     }
 }
