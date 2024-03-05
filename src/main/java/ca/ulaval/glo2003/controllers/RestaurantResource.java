@@ -84,17 +84,16 @@ public class RestaurantResource {
         reservationRequest.verifyParameters();
         reservationRequest.adjustReservationStartTime();
         verifyValidReservationEndTime(reservationRequest, restaurantId);
-        Reservation reservation = new Reservation(
-            restaurantId,
-            reservationRequest.getDate(),
-            reservationRequest.getStartTime(),
-            reservationRequest.getGroupSize(),
-            reservationRequest.getCustomer());
 
-        resourcesHandler.addReservation(reservation);
+        String createdReservationId = resourcesHandler.addReservation(
+                restaurantId,
+                reservationRequest.getDate(),
+                reservationRequest.getStartTime(),
+                reservationRequest.getGroupSize(),
+                reservationRequest.getCustomer());
         URI newReservationURI = UriBuilder.fromPath(Main.BASE_URI)
             .path("reservations")
-            .path(reservation.getId())
+            .path(createdReservationId)
             .build();
         return Response.created(newReservationURI).build();
     }

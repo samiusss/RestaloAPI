@@ -29,7 +29,7 @@ public class ResourceHandlerTest {
         when(restaurant.getOwnerId()).thenReturn(OWNER_ID);
         when(restaurant.getName()).thenReturn(RESTAURANT_NAME);
 
-        resourcesHandler = new ResourcesHandler();
+        resourcesHandler = new ResourcesHandler(reservationsFactory);
     }
 
     @Test

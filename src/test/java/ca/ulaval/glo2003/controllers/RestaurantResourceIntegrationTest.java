@@ -41,7 +41,7 @@ public class RestaurantResourceIntegrationTest extends JerseyTest {
         validHours.setOpen("11:00:00");
         validHours.setClose("19:30:00");
         validRestaurant = new Restaurant(OWNER_ID, RESTAURANT_NAME, VALID_RESTAURANTS_CAPACITY, validHours);
-        resourcesHandler = new ResourcesHandler();
+        resourcesHandler = new ResourcesHandler(reservationsFactory);
         resourcesHandler.addRestaurant(validRestaurant);
 
 

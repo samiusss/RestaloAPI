@@ -1,8 +1,11 @@
 package ca.ulaval.glo2003.domain.utils;
 
+import ca.ulaval.glo2003.domain.customer.Customer;
 import ca.ulaval.glo2003.domain.reservation.Reservation;
 import ca.ulaval.glo2003.domain.restaurant.Restaurant;
 import ca.ulaval.glo2003.models.RestaurantResponse;
+import ca.ulaval.glo2003.domain.factories.ReservationFactory;
+
 import jakarta.ws.rs.NotFoundException;
 
 import java.util.ArrayList;
@@ -13,8 +16,10 @@ import java.util.Objects;
 
 public class ResourcesHandler {
     private final Map<String, Restaurant> restaurants;
+    private ReservationFactory reservationsFactory;
 
-    public ResourcesHandler() {
+    public ResourcesHandler(ReservationFactory reservationsFactory) {
+        this.reservationsFactory = reservationsFactory;
         this.restaurants = new HashMap<>();
     }
 
@@ -38,11 +43,12 @@ public class ResourcesHandler {
         return ownerRestaurants;
     }
 
-    public void addReservation(Reservation reservation) throws NotFoundException {
-        String restaurantId = reservation.getRestaurantId();
+    public String addReservation(String restaurantId, String date, String startTime, Integer groupSize, Customer customer)
+            throws NotFoundException {
         Restaurant restaurant = restaurants.get(restaurantId);
-
+        Reservation reservation = reservationsFactory.buildReservation(restaurantId, date, startTime, groupSize, customer);
         restaurant.addReservation(reservation);
+        return reservation.getId();
     }
 
     public Reservation getReservation(String reservationId) throws NotFoundException {

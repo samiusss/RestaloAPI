@@ -16,7 +16,7 @@ public class Main {
     public static final String BASE_URI = "http://0.0.0.0:8080/";
 
     public static HttpServer startServer() {
-        final ResourcesHandler resourcesHandler = new ResourcesHandler();
+        final ResourcesHandler resourcesHandler = new ResourcesHandler(reservationsFactory);
         final ResourceConfig rc = new ResourceConfig()
             .register(new HealthResource())
             .register(new RestaurantResource(resourcesHandler))
