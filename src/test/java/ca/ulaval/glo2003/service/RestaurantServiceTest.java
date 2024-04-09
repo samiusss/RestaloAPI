@@ -73,9 +73,19 @@ public class RestaurantServiceTest {
     }
 
     @Test
-    void givenValidRequest_whenCreatingRestaurant_shouldSaveRestaurantInRepository() throws InvalidParameterException, MissingParameterException {
-        RestaurantRequest restaurantRequest = new RestaurantRequest(RESTAURANT_NAME, CAPACITY, new HoursDTO("10:00:00", "11:00:00"), null);
-        when(restaurantFactory.createRestaurant(OWNER_ID, RESTAURANT_NAME, CAPACITY, new HoursDTO("10:00:00", "11:00:00"), null)).thenReturn(restaurantMock);
+    void givenValidRequest_whenCreatingRestaurant_shouldSaveRestaurantInRepository()
+        throws InvalidParameterException, MissingParameterException {
+        RestaurantRequest restaurantRequest = new RestaurantRequest(
+            RESTAURANT_NAME, CAPACITY,
+            new HoursDTO("10:00:00",
+                "11:00:00"),
+            null);
+        when(restaurantFactory.createRestaurant(
+            OWNER_ID,
+            RESTAURANT_NAME,
+            CAPACITY,
+            new HoursDTO("10:00:00", "11:00:00"), null))
+            .thenReturn(restaurantMock);
 
         String restaurantId = restaurantService.createRestaurant(OWNER_ID, restaurantRequest);
 
@@ -89,13 +99,21 @@ public class RestaurantServiceTest {
 
     @Test
     void givenNonExistingRestaurant_whenGetRestaurant_shouldThrowNotFoundException() {
-        assertThrows(NotFoundException.class, () -> restaurantService.getRestaurant(OWNER_ID, "Non existing Restaurant"));
+        assertThrows(
+            NotFoundException.class,
+            () -> restaurantService.getRestaurant(OWNER_ID, "Non existing Restaurant"));
     }
 
     @Test
     void givenExistingRestaurant_whenGetRestaurant_thenShouldReturnRestaurant() throws MissingParameterException {
         when(restaurantRepository.findRestaurantById(RESTAURANT_ID)).thenReturn(restaurantMock);
-        RestaurantResponse expectedResponse = new RestaurantResponse(RESTAURANT_ID, OWNER_ID, RESTAURANT_NAME, CAPACITY, new HoursDTO("10:00:00", "11:00:00"), null);
+        RestaurantResponse expectedResponse = new RestaurantResponse(
+            RESTAURANT_ID,
+            OWNER_ID,
+            RESTAURANT_NAME,
+            CAPACITY,
+            new HoursDTO("10:00:00", "11:00:00"),
+            null);
         when(restaurantResponseAssembler.toDTO(restaurantMock)).thenReturn(expectedResponse);
 
         RestaurantResponse restaurantResponse = restaurantService.getRestaurant(OWNER_ID, RESTAURANT_ID);
@@ -138,7 +156,8 @@ public class RestaurantServiceTest {
     }
 
     @Test
-    void givenValidOwnerIdAndRestaurantId_whenDeleteRestaurant_thenShouldDeleteRestaurantAndReservations() throws MissingParameterException, NotFoundException {
+    void givenValidOwnerIdAndRestaurantId_whenDeleteRestaurant_thenShouldDeleteRestaurantAndReservations()
+        throws MissingParameterException, NotFoundException {
         when(restaurantRepository.findRestaurantById(RESTAURANT_ID)).thenReturn(restaurantMock);
 
         restaurantService.deleteRestaurant(OWNER_ID, RESTAURANT_ID);
