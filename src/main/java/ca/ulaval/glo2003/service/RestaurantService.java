@@ -38,23 +38,19 @@ public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final ReservationRepository reservationRepository;
     private final RestaurantFactory restaurantFactory;
-    private final HoursAssembler hoursAssembler;
     private final RestaurantResponseAssembler restaurantResponseAssembler;
-    private final FuzzySearchAssembler fuzzySearchAssembler;
     private final AvailabilitiesResponseAssembler availabilitiesResponseAssembler = new AvailabilitiesResponseAssembler();
     private final FuzzySearchResponseAssembler fuzzySearchResponseAssembler;
 
     @Inject
     public RestaurantService(RestaurantRepository restaurantRepository, ReservationRepository reservationRepository,
                              RestaurantFactory restaurantFactory,
-                             HoursAssembler hoursAssembler, RestaurantResponseAssembler restaurantResponseAssembler,
-                             FuzzySearchAssembler fuzzySearchAssembler, FuzzySearchResponseAssembler fuzzySearchResponseAssembler)  {
+                             RestaurantResponseAssembler restaurantResponseAssembler,
+                             FuzzySearchResponseAssembler fuzzySearchResponseAssembler)  {
         this.restaurantRepository = restaurantRepository;
         this.reservationRepository = reservationRepository;
         this.restaurantFactory = restaurantFactory;
-        this.hoursAssembler = hoursAssembler;
         this.restaurantResponseAssembler = restaurantResponseAssembler;
-        this.fuzzySearchAssembler = fuzzySearchAssembler;
         this.fuzzySearchResponseAssembler = fuzzySearchResponseAssembler;
     }
 
@@ -73,6 +69,7 @@ public class RestaurantService {
     public void deleteRestaurant(String ownerId, String restaurantId) throws MissingParameterException, NotFoundException {
         headerValidator.verifyMissingHeader(ownerId);
         Restaurant restaurant = restaurantRepository.findRestaurantById(restaurantId);
+        if (restaurant == null) throw new NotFoundException();
         getRestaurantValidator.validateRestaurantOwnership(ownerId, restaurant.getOwnerId());
         restaurantRepository.deleteRestaurant(ownerId, restaurantId);
         reservationRepository.deleteReservationsWithRestaurantId(restaurantId);
@@ -88,6 +85,7 @@ public class RestaurantService {
     public RestaurantResponse getRestaurant(String ownerId, String restaurantId) throws MissingParameterException {
         headerValidator.verifyMissingHeader(ownerId);
         Restaurant restaurant = restaurantRepository.findRestaurantById(restaurantId);
+        if (restaurant == null) throw new NotFoundException();
         getRestaurantValidator.validateRestaurantOwnership(ownerId, restaurant.getOwnerId());
         return restaurantResponseAssembler.toDTO(restaurant);
     }
@@ -105,8 +103,6 @@ public class RestaurantService {
         return searchedRestaurants;
     }
 
-
-    //TODO: (possibility to move these elsewhere in utils of service layer)
     public boolean shouldMatchRestaurantName(FuzzySearchRequest search, Restaurant restaurant) {
         return search.name() == null || FuzzySearch.isFuzzySearchOnNameSuccessful(search.name(), restaurant.getName());
     }
@@ -125,7 +121,6 @@ public class RestaurantService {
     }
 
     public List<AvailabilitiesResponse> getAvailabilitiesForRestaurant(String restaurantId, String date) {
-//      availabilitiesValidator.verifyAvailabilityValidParameters(search);
         Restaurant restaurant = restaurantRepository.findRestaurantById(restaurantId);
         Availabilities availabilities = new Availabilities(date, restaurant.getCapacity());
         List<Reservation> restaurantReservationList = reservationRepository.getAllRestaurantReservations(restaurantId);
