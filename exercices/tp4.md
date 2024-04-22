@@ -28,6 +28,7 @@ En tant que client, je devrais pouvoir laisser une note à un restaurant que j�
 ---
 
 ## **Open Source**
+### **Questions**
 
 **1. Nommez 3 avantages à contribuer à des projets open source en tant qu'entreprise et justifiez en quoi cela peut être bénéfique pour tous.**
 
@@ -80,4 +81,29 @@ backdoors ou de failles intentionnelles, ce qui peut être un risque avec le cod
 renforcer la sécurité du code et de réduire les risques pour les utilisateurs. Cela peut être un argument de poids pour
 convaincre les entreprises de passer à l'open source et de contribuer à des projets open source.
 
-[Top 10 Misconceptions about open source software](https://www.hotwaxsystems.com/hotwax-blog/ofbiz/the-top-10-misconceptions-about-open-source-software)
+[Top 10 Misconceptions about open source software]
+(https://www.hotwaxsystems.com/hotwax-blog/ofbiz/the-top-10-misconceptions-about-open-source-software)
+
+### **Notre Code de conduite**
+
+Notre code de conduite est adapté de la [Contributor Covenant]
+(https://www.contributor-covenant.org/version/1/4/code-of-conduct.html) version 1.4. Nous avons choisi ce modèle
+principalement, car il est très complet et qu'il est utilisé par de nombreux projets open source. Il est important pour
+nous de créer un environnement sain et inclusif pour notre communauté open source, et ce code de conduite nous permet
+de poser des bases solides pour cela. Nous avons également ajouté quelques éléments spécifiques à notre projet pour
+répondre à nos besoins spécifiques et à notre vision du projet.
+
+### **License**
+
+Nous avons choisi la licence MIT pour notre projet open source. Nous avons choisi cette licence principalement, car elle
+est très permissive et permet à quiconque d'utiliser, de modifier et de distribuer notre code sans restrictions. De plus, la licence
+MIT est très populaire et bien connue, ce qui facilite la compréhension et l'acceptation de notre projet par les
+utilisateurs et les contributeurs qui voudraient potentiellement l'utiliser. Enfin, la licence MIT est compatible avec 
+de nombreuses autres licences open source, ce qui permet de faciliter l'intégration de notre projet dans d'autres 
+projets open source dans le futur. Dans notre cas, il n'a pas été nécessaire pour nous de choisir une license comme 
+Apache 2.0, car nous ne sommes pas une entreprise et nous n'avons pas de brevets à protéger. Nous n'avions pas non plus
+à utiliser une license GPL, car nous ne voulions pas imposer de restrictions sur l'utilisation du code par les
+utilisateurs et les contributeurs.
+
+[The Legal Side Of Open Source](https://opensource.guide/legal/#which-open-source-license-is-appropriate-for-my-project)
+

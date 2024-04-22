@@ -1,50 +1,73 @@
-# Projet - Restalo
+# Restalo
 
-Le meilleur logiciel de réservation en restauration!
+Restalo is an API for managing restaurant reservations. It provides functionalities for creating and managing
+reservations, searching for restaurants and reservations, and reviewing restaurants.
 
-## Requis
+[![npm version](https://img.shields.io/npm/v/my-package.svg)](https://www.npmjs.com/package/my-package)
+[![Known Vulnerabilities](https://snyk.io/test/github/your-username/your-repo/badge.svg)](https://snyk.io/test/github/your-username/your-repo)
+[![GitHub Actions](https://github.com/your-username/your-repo/workflows/CI/badge.svg)](https://github.com/your-username/your-repo/actions)
+
+## Getting Started
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing
+purposes.
+
+### Prerequisites
 
 - Java 21
 - Maven 3.x
 
-## Commandes
+### Installation
 
-### Compilation
+Clone the repository:
 
-```
-mvn compile
-```
-
-### Exécution
-
-```
-mvn exec:java
+```bash
+git clone https://github.com/username/restalo.git
+cd restalo
 ```
 
-### Run Docker Image
+Build the project:
 
+```bash
+mvn clean install
 ```
+
+Run the project:
+
+```bash
+mvn spring-boot:run
+```
+
+Docker build image
+
+```bash
+docker build -t restalo .
+```
+
+Docker run image
+
+```bash
 docker compose up -d
 ```
 
-### Stop Docker Image
+Docker stop image
 
-```
+```bash
 docker compose down -v
 ```
 
-### Choose persistence
-    
-```
-In SystemProperty, choose the persistence with -Dpersistence=... (mongo or inmemory)
-```
+## Open Source files
 
-### For conecting to the database
+For more information about the project and how to contribute, please refer to the following files:
 
-```
-Create a mongo username and password though the Edit Configuration window, 
-and connect with the URL structure provided.
-```
+- [CONTRIBUTING](CONTRIBUTING.md)
+- [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)
+- [LICENSE](LICENSE)
 
+## License
 
+This project is lisenced under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## Acknowledgments
+
+Thanks to all contributors who participated in this project and helped make it better.
